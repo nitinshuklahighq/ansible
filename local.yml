@@ -2,6 +2,5 @@
 - hosts: all
   tasks:
     - name: Install Haproxy
-      become: yes
-      yum: name=haproxy state=present
+      shell: pwd
 
