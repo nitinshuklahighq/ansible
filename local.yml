@@ -3,6 +3,6 @@
   tasks:
     - name: Install Haproxy
       become: yes
-      yum: name=haproxy state=present
+      apt: name=haproxy state=present
 
 
