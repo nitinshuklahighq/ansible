@@ -5,8 +5,7 @@
       shell: pwd
       register: pwd_result
 
-  - set_fact: pwd_output={{pwd_result.stdout}}
 
-  - debug: msg="{{pwd_output}}"
+  - debug: msg="{{pwd_result}}"
 
 
