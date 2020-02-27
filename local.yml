@@ -1,6 +1,7 @@
 ---
 - hosts: all
   become: true
+  remote_user: root
   vars:
     NORMAL_USER_NAME: 'nitins1'
   tasks:
