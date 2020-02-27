@@ -2,10 +2,7 @@
 - hosts: all
   tasks:
     - name: Install Haproxy
-      shell: pwd
-      register: pwd_result
-
-
-  - debug: msg="{{pwd_result}}"
+      become: yes
+      yum: name=haproxy state=present
 
 
