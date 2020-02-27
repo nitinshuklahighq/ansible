@@ -1,16 +1,7 @@
 ---
 - hosts: all
-  become: true
-  remote_user: root
-  vars:
-    NORMAL_USER_NAME: 'nitins1'
   tasks:
-    - name: "Create a secondary, non-root user"
-      user: name={{ NORMAL_USER_NAME }}
-            password='$1$Ycp7kl3Z$uvTaXsP89HMSbyi4vJYeu/'
-            shell=/bin/bash
-    - name: Add normal user to sudoers
-      lineinfile: dest=/etc/sudoers
-                  regexp="{{ NORMAL_USER_NAME }} ALL"
-                  line="{{ NORMAL_USER_NAME }} ALL=(ALL) ALL"
-                  state=present
+    - name: Install Haproxy
+      become: yes
+      yum: name=haproxy state=present
+
