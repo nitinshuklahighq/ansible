@@ -1,0 +1,178 @@
+---
+
+- name: Create Tools Directory
+  win_file:
+    path: C:\Tools
+    state: directory
+
+- name: Create Tools Directory
+  win_file:
+    path: C:\Tools\workflowsg2
+    state: directory
+
+
+#- name: Download file from Bitbucket
+  #win_get_url:
+  #  url: https://aka.ms/vs/16/release/{{vcversion}}
+  #  dest: C:\Tools\workflowsg2
+  #  force: True
+
+
+- name: Download file from Bitbucket
+  git:
+    repo: https://github.com/nittinshukla/ansible.git
+    dest: /home/nitin/playbooks/roles/win_workflow/files/workflow/
+    version: master
+    force: yes
+  delegate_to: 127.0.0.1 
+  register: gitresult
+  #working#notify:
+  #- stop workflow service
+
+
+- debug:
+    var: gitresult
+
+
+- name: stop workflow service
+  win_service:
+    name: Apache2.4
+    state: stopped
+  when: gitresult.changed == true
+
+
+
+- name: Configure start.bat file
+  template:
+    src: start.bat.j2
+    dest: C:\Tools\workflowsg2\start.bat
+
+
+## this is working
+#- name: Copy war file
+#  win_copy:
+#    src: "{{vcversion}}"
+#    dest:  C:\Tools\workflowsg2\{{vcversion}}
+  #notify:
+  #- stop workflow service
+
+
+
+
+- name: Copy war file
+  win_copy:
+    src: "{{vcversion}}"
+    dest:  C:\Tools\workflowsg2\{{vcversion}}
+    backup: yes
+    backup_file: C:\Tools\
+  register: chkwarfile
+
+- debug:
+    var: chkwarfile
+
+
+- name: stop workflow service01
+  win_service:
+    name: Apache2.4
+    state: stopped
+  when: chkwarfile.changed == true
+
+
+#- name: print stat
+#  stat:
+#    path: /home/nitin/playbooks/roles/win_workflow/files/workflow1.1.jar
+#  delegate_to: 127.0.0.1
+#  register: checkstat
+
+- name: print stat
+  win_stat:
+    path: C:\Tools\workflowsg2\{{vcversion}}
+  register: checkstat
+
+
+- debug:
+    msg: "{{checkstat}}"
+
+
+- debug:
+    var: checkstat.stat.checksum
+#  delegate_to: 127.0.0.1
+  register: checkstat_result
+
+- debug:
+    var: checkstat.stat.size
+#  delegate_to: 127.0.0.1
+  register: checkstat_size
+
+
+- set_fact: checkstat_results={{checkstat_result}}
+
+- set_fact: checkstat_sizes={{checkstat_size}}
+
+
+#- name: stop workflow service
+#  win_service:
+#    name: Apache2.4
+#    state: stopped
+#  when: checkstat.stat.checksum == False
+  #when: checkstat_sizes is changed
+   
+
+#- name: stop workflow
+#  notify:
+#  - stop workflow service
+ # when: checkstat.stat.checksum == True
+
+
+
+#- name: Copy war file
+#  win_copy:
+#    src: workflow/{{vcversion}}
+#    dest:  C:\Tools\workflowsg2\{{vcversion}}
+#  register: checkcp
+#  notify:
+#  - stop workflow service
+#  - remove old war file
+
+
+
+
+
+
+
+
+
+
+############### all below debug works
+#- debug:
+#    msg: "{{checkstat}}"
+
+
+#- debug: msg="{{checkstat}}"
+
+
+#- debug:
+#    var: checkstat
+
+
+#- debug:
+#    var: checkstat.stat.checksum
+
+##################
+
+#- name: Get SHA1 checksum of file
+#  win_stat:
+#    path: /home/nitin/playbooks/roles/win_workflow/files/workflow1.1.jar
+#    get_checksum: yes
+#  delegate_to: 127.0.0.1 
+#  register: sha1_checksum
+
+#- debug:
+#    var: sha1_checksum.stat.checksum
+
+
+#- name: Install Workflow Microservice
+#  win_nssm:
+#    name: workflowsg2
+#    executable: C:\Tools\nssm-2.24\win64\nssm.exe
+#    application: C:\Tools\workflowsg2\start.bat
